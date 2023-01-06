@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { createAudioPlayer, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus, AudioPlayerStatus, entersState, AudioPlayerStatus } = require('@discordjs/voice');
-
+const { StreamType, createAudioPlayer, createAudioResource, joinVoiceChannel, NoSubscriberBehavior, VoiceConnectionStatus, entersState, AudioPlayerStatus, getVoiceConnection } = require('@discordjs/voice');
+const { createReadStream } = require('node:fs');
 
 
 module.exports = {
@@ -9,13 +9,15 @@ module.exports = {
         .setDescription('Plays life point sound'),
 
     async execute(interaction){
-        await interaction.reply();
-        const connection = getVoiceConnection(myVoiceChannel.guild.id);
-        const subscription = connection.subscribe(audioPlayer);
+        const connection = joinVoiceChannel({
+            channelId: interaction.member.voice.channelId,
+            guildId: interaction.member.guild.id,
+            adapterCreator: interaction.member.voice.guild.voiceAdapterCreator,
+        });
 
-        if (subscription) {
-            setTimeout(() => subscription.unsubscribe(), 5_000);
-        }
+        connection.on('error', error => {
+            console.error(`${error.message}`);
+        });
 
         connection.on(VoiceConnectionStatus.Ready, (oldState, newState) => {
             console.log('Connection is in the Ready state!');
@@ -37,36 +39,31 @@ module.exports = {
                 noSubscriber: NoSubscriberBehavior.Stop,
             },
         });
-
-        const resource = createAudioResource('./sounds/loselp.wav', {
+        
+        const resource = createAudioResource(createReadStream('sounds/lpsound.ogg'), {
+            inputType: StreamType.OggOpus,
             metadata: {
                 title: 'Life Point Loss',
             },
-            
-        }, { inlineVolume: true });
-        resource.volume.setVolume(0.4);
+        });
         player.play(resource);
 
         player.on('error', error => {
             console.error(`Error: ${error.message} with resource ${error.resource.metadata.title}`);
-            player.play(getNextResource());
         });
 
         player.on(AudioPlayerStatus.Playing, () => {
             console.log('The audio player has started playing!');
         });
         
+        /*
         player.on(AudioPlayerStatus.Idle, () => {
             player.play(getNextResource());
-        });
+        });*/
 
         connection.subscribe(player);
 
         player.stop();
         connection.destroy();
     },
-
-   
-    
-    player.on
 };
