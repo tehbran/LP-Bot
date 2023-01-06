@@ -4,7 +4,7 @@ const { VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice')
 const path = require('node:path');
 const { token } = require('./config.json');
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [ GatewayIntentBits.Guilds, GatewayIntentBits.GuildVoiceStates] });
 
 client.commands = new Collection();
 
@@ -26,8 +26,6 @@ client.once(Events.ClientReady, c=> {
     console.log(`Ready! logged in as ${c.user.tag}`);
 });
 
-client.login(token);
-
 client.on(Events.InteractionCreate, async interaction => {
     if (!interaction.isChatInputCommand()) return;
 
@@ -46,3 +44,4 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 });
 
+client.login(token);
