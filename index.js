@@ -1,4 +1,5 @@
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { VoiceConnectionStatus, AudioPlayerStatus } = require('@discordjs/voice');
 const path = require('node:path');
 const { token } = require('./config.json');
 
@@ -43,3 +44,4 @@ client.on(Events.InteractionCreate, async interaction => {
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true});
     }
 });
+
