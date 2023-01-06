@@ -9,15 +9,42 @@ module.exports = {
         .setDescription('Plays life point sound'),
 
     async execute(interaction){
-        const connection = joinVoiceChannel({
-            channelId: interaction.member.voice.channelId,
-            guildId: interaction.member.guild.id,
-            adapterCreator: interaction.member.voice.guild.voiceAdapterCreator,
+        const player = createAudioPlayer({
+            behaviors: {
+            },
+        });
+        console.log(interaction.voice);
+        
+        const resource = createAudioResource(createReadStream('./sounds/lpsound.ogg'), {
+            inputType: StreamType.OggOpus,
+            metadata: {
+                title: 'Life Point Loss',
+            },
         });
 
+        player.on('error', error => {
+            console.error(`Error: ${error.message} with resource ${error.resource.metadata.title}`);
+        });
+
+        player.on(AudioPlayerStatus.Playing, () => {
+            console.log('The audio player has started playing!');
+        });
+
+        const channel = interaction.member.voice.channel;
+        if(!channel) return interaction.channel.send('Please join a Voice Channel first');
+
+        const connection = joinVoiceChannel({
+            channelId: channel.id,
+            guildId: interaction.guild.id,
+            adapterCreator: interaction.guild.voiceAdapterCreator,
+        });
+        
         connection.on('error', error => {
             console.error(`${error.message}`);
         });
+
+        player.play(resource);
+        connection.subscribe(player);
 
         connection.on(VoiceConnectionStatus.Ready, (oldState, newState) => {
             console.log('Connection is in the Ready state!');
@@ -33,35 +60,11 @@ module.exports = {
                 connection.destroy();
             }
         })
-
-        const player = createAudioPlayer({
-            behaviors: {
-                noSubscriber: NoSubscriberBehavior.Stop,
-            },
-        });
-        
-        const resource = createAudioResource(createReadStream('sounds/lpsound.ogg'), {
-            inputType: StreamType.OggOpus,
-            metadata: {
-                title: 'Life Point Loss',
-            },
-        });
-        player.play(resource);
-
-        player.on('error', error => {
-            console.error(`Error: ${error.message} with resource ${error.resource.metadata.title}`);
-        });
-
-        player.on(AudioPlayerStatus.Playing, () => {
-            console.log('The audio player has started playing!');
-        });
         
         /*
         player.on(AudioPlayerStatus.Idle, () => {
             player.play(getNextResource());
         });*/
-
-        connection.subscribe(player);
 
         player.stop();
         connection.destroy();
