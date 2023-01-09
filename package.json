@@ -11,8 +11,6 @@
   "dependencies": {
     "@discordjs/opus": "github:discordjs/opus",
     "@discordjs/voice": "^0.14.0",
-    "@ffmpeg/core": "^0.11.0",
-    "@ffmpeg/ffmpeg": "^0.11.6",
     "discord.js": "^14.7.1",
     "ffmpeg-static": "^5.1.0",
     "sodium-native": "^3.4.1"
