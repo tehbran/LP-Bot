@@ -69,8 +69,5 @@ module.exports = {
         player.play(resource);
         //await interaction.reply('Taking damage');
         
-        /*player.on(AudioPlayerStatus.Idle, () => {
-            player.play(getNextResource());
-        });*/
     },
 }; 
