@@ -6,6 +6,7 @@ const { createReadStream } = require('node:fs');
 //vol is the desired inlineVolume IF ffmpeg is to be used
 async function soundPlayer(sound, interaction, vol = 0.2){
 
+    //BEGIN VoiceConnection block
     //Checks if the user issuing the command is in a Voice Channel
     if(!interaction.member.voice.channel) return interaction.channel.send('Please join a Voice Channel first');
 
@@ -32,7 +33,9 @@ async function soundPlayer(sound, interaction, vol = 0.2){
             connection.destroy();
         }
     })
+    //END VoiceConnection block
 
+    //BEGIN AudioPlayer block
     //Creates an Audio Player that stops itself if no one is in the voice channel
     const player = createAudioPlayer({
         behaviors: {
@@ -73,7 +76,9 @@ async function soundPlayer(sound, interaction, vol = 0.2){
             connection.destroy();
         }
     });
+    //END AudioPlayer block
 
+    //BEGIN AudioResource block
     //Checks if the file is ogg, if so it will play using the Opus stream, else ffmpeg
     resource = null;
     switch ( sound.split('.').pop() ){
@@ -87,6 +92,7 @@ async function soundPlayer(sound, interaction, vol = 0.2){
             resource.volume.setVolume(vol);
         }
     }
+    //END AudioResource block
 
     //Logs the user that issued the command
     console.log(interaction.member.displayName);
