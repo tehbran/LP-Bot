@@ -12,21 +12,21 @@ module.exports = {
         const channel = interaction.member.voice.channel;
         if(!channel) return interaction.channel.send('Please join a Voice Channel first');
 
-        const voiceConnection = joinVoiceChannel({
+        const connection = joinVoiceChannel({
             channelId: channel.id,
             guildId: interaction.guild.id,
             adapterCreator: interaction.guild.voiceAdapterCreator,
         });
 
-        voiceConnection.on('stateChange', (oldState, newState) => {
+        connection.on('stateChange', (oldState, newState) => {
             console.log(`Connection transitioned from ${oldState.status} to ${newState.status}`);
         });
 
-        voiceConnection.on(VoiceConnectionStatus.Ready, (oldState, newState) => {
+        connection.on(VoiceConnectionStatus.Ready, (oldState, newState) => {
             console.log('Connection is in the Ready state!');
         });
 
-        voiceConnection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
+        connection.on(VoiceConnectionStatus.Disconnected, async (oldState, newState) => {
             try{
                 await Promise.race([
                     entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
@@ -58,6 +58,7 @@ module.exports = {
                 ]);
             } catch (error) {
                 player.stop();
+                connection.destroy();
             }
         });
 
@@ -65,9 +66,10 @@ module.exports = {
             inputType: StreamType.OggOpus,
         }));
 
-        voiceConnection.subscribe(player);
+        console.log(interaction.member.displayName);
+        connection.subscribe(player);
         player.play(resource);
-        //await interaction.reply('Taking damage');
+        await interaction.reply({ content: 'Taking damage', ephemeral: true });
         
     },
 }; 
