@@ -79,13 +79,16 @@ async function soundPlayer(sound, interaction, vol = 0.2){
     //END AudioPlayer block
 
     //BEGIN AudioResource block
-    //Checks if the file is ogg, if so it will play using the Opus stream, else ffmpeg
-    resource = null;
+    //Checks if the file is ogg or webm, if so it will play using the Opus stream, else ffmpeg
     switch ( sound.split('.').pop() ){
         case "ogg":
             resource = createAudioResource(createReadStream(sound, {
                 inputType: StreamType.OggOpus,
         }));
+        case "webm":
+            resource = createAudioResource(createReadStream(sound, {
+                inputType: StreamType.WebmOpus,
+            }));
         default:
         {
             resource = createAudioResource(sound, { inlineVolume: true} );
