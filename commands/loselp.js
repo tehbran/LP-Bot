@@ -17,5 +17,7 @@ module.exports = {
         //TODO: implement database of users who have taken damage
         //TODO: implement a chat reaction vote to confirm that a user will take damage
         //TODO: implement an @mention arg to designate a user to take damage
+
+        
     },
 }; 
