@@ -8,7 +8,7 @@ async function soundPlayer(sound, interaction, vol = 0.2){
 
     //BEGIN VoiceConnection block
     //Checks if the user issuing the command is in a Voice Channel
-    if(!interaction.member.voice.channel) return interaction.channel.send('Please join a Voice Channel first');
+    if(!interaction.member.voice.channel) return interaction.reply({content:'Please join a Voice Channel first', ephermeral:true});
 
     //Creates a voice connection
     const connection = joinVoiceChannel({
@@ -31,6 +31,7 @@ async function soundPlayer(sound, interaction, vol = 0.2){
             ]);
         } catch (error) {
             connection.destroy();
+            player.stop();
         }
     })
     //END VoiceConnection block
